@@ -12,14 +12,17 @@ if ($_POST) {
     // Get the user map data
     if (array_key_exists("data", $p) && !empty($p["data"])) {
         $data = json_decode($p['data'], true);
-        $status = updateShare($data['authtoken'], $data['ShareID'],  $data['coords'],  $data['time']);
-        if ($status) {
-            echo json_encode(array('status' => true));
+        $validation = validateAuthToken($data['authtoken']);
+
+        if ($validation['valid']) {
+            echo json_encode(array('displayname' => $validation['displayname'], 'status' => true));
         } else {
-            echo json_encode(array('status' => false));
+            echo json_encode(array('displayname' => '', 'status' => false));
         }
     }
 } else {
     //echo 'Error: Nothing POSTed.';
 }
 ?>
+
+

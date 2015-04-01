@@ -9,11 +9,11 @@ if ($_POST) {
         $p[$key] = $value;
     }
 
-    // Get the user map data
     if (array_key_exists("data", $p) && !empty($p["data"])) {
         $data = json_decode($p['data'], true);
-        $status = updateShare($data['authtoken'], $data['ShareID'],  $data['coords'],  $data['time']);
-        if ($status) {
+        $UserID = getUserIDFromAuthtokenData($data['authtoken']);
+        $success = removeShare($UserID, $data['ShareID']); 
+        if ($success) {
             echo json_encode(array('status' => true));
         } else {
             echo json_encode(array('status' => false));
@@ -23,3 +23,5 @@ if ($_POST) {
     //echo 'Error: Nothing POSTed.';
 }
 ?>
+
+

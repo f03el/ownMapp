@@ -1,0 +1,477 @@
+.map {
+    background: rgba(232,224,216,1);
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 0;
+}
+.ol-mouse-position {
+    top: 8px;
+    right: 8px;
+    position: absolute}
+.ol-scale-line {
+    background: #95b9e6;
+    background: rgba(0,60,136,.3);
+    border-radius: 4px;
+    bottom: 8px;
+    left: 8px;
+    padding: 2px;
+    position: absolute}
+.ol-scale-line-inner {
+    border: 1px solid #eee;
+    border-top: none;
+    color: #eee;
+    font-size: 10px;
+    text-align: center;
+    margin: 1px;
+    padding: 0 2px}
+.ol-unsupported {
+    display: none}
+.ol-viewport .ol-unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent}
+.ol-control {
+    position: absolute;
+    background-color: #eee;
+    background-color: rgba(255,255,255,.4);
+    border-radius: 4px;
+    padding: 2px}
+.ol-control:hover {
+    background-color: rgba(255,255,255,.6)}
+.ol-zoom {
+    top: .5em;
+    left: .5em}
+.ol-rotate {
+    top: .5em;
+    right: .5em;
+    transition: opacity .25s}
+.ol-rotate.ol-hidden {
+    opacity: 0;
+    display: none}
+.ol-zoom-extent {
+    top: 4.643em;
+    left: .5em}
+.ol-full-screen {
+    right: .5em;
+    top: .5em}
+@media print {
+    .ol-control {
+        display: none}
+}
+.ol-control button {
+    display: block;
+    margin: 1px;
+    padding: 0;
+    color: #fff;
+    font-size: 1.14em;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    height: 1.375em;
+    width: 1.375em;
+    line-height: .4em;
+    background-color: #7b98bc;
+    background-color: rgba(0,60,136,.5);
+    border: none;
+    border-radius: 2px}
+.ol-control button: : -moz-focus-inner {
+    border: none;
+    padding: 0}
+.ol-zoom-extent button {
+    line-height: 1.4em}
+.ol-compass {
+    display: block;
+    font-weight: 400;
+    font-size: 1.2em}
+.ol-touch .ol-control button {
+    font-size: 1.5em}
+.ol-touch .ol-zoom-extent {
+    top: 5.5em}
+.ol-control button:focus,.ol-control button:hover {
+    text-decoration: none;
+    background-color: #4c6079;
+    background-color: rgba(0,60,136,.7)}
+.ol-zoom-extent button:after {
+    content: "E"}
+.ol-zoom .ol-zoom-in {
+    border-radius: 2px 2px 0 0}
+.ol-zoom .ol-zoom-out {
+    border-radius: 0 0 2px 2px}
+button.ol-full-screen-false:after {
+    content: "\2194"}
+button.ol-full-screen-true:after {
+    content: "\00d7"}
+.ol-attribution {
+    text-align: right;
+    bottom: .5em;
+    right: .5em;
+    max-width: calc(100% - 1.3em)}
+.ol-attribution ul {
+    margin: 0;
+    padding: 0 .5em;
+    font-size: .7rem;
+    line-height: 1.375em;
+    color: #000;
+    text-shadow: 0 0 2px #fff}
+.ol-attribution li {
+    display: inline;
+    list-style: none;
+    line-height: inherit}
+.ol-attribution li: not(: last-child):after {
+    content: " "}
+.ol-attribution img {
+    max-height: 2em;
+    max-width: inherit}
+.ol-attribution button,.ol-attribution ul {
+    display: inline-block}
+.ol-attribution.ol-collapsed ul {
+    display: none}
+.ol-attribution.ol-logo-only ul {
+    display: block}
+.ol-attribution: not(.ol-collapsed) {
+    background: rgba(255,255,255,.8)}
+.ol-attribution.ol-uncollapsible {
+    bottom: 0;
+    right: 0;
+    border-radius: 4px 0 0;
+    height: 1.1em;
+    line-height: 1em}
+.ol-attribution.ol-logo-only {
+    background: 0 0;
+    bottom: .4em;
+    height: 1.1em;
+    line-height: 1em}
+.ol-attribution.ol-uncollapsible img {
+    margin-top: -.2em;
+    max-height: 1.6em}
+.ol-attribution.ol-logo-only button,.ol-attribution.ol-uncollapsible button {
+    display: none}
+.ol-zoomslider {
+    position: absolute;
+    top: 4.5em;
+    left: .5em;
+    background: #eee;
+    background: rgba(255,255,255,.4);
+    width: 24px;
+    height: 200px}
+.ol-zoomslider-thumb {
+    position: absolute;
+    background: #7b98bc;
+    background: rgba(0,60,136,.5);
+    border-radius: 2px;
+    cursor: pointer;
+    height: 10px;
+    width: 22px;
+    margin: 3px}
+.ol-touch .ol-zoomslider {
+    top: 5.5em;
+    width: 2.052em}
+.ol-touch .ol-zoomslider-thumb {
+    width: 1.8em}
+.ol-overviewmap {
+    position: absolute;
+    left: .5em;
+    bottom: .5em}
+.ol-overviewmap.ol-uncollapsible {
+    bottom: 0;
+    left: 0;
+    border-radius: 0 4px 0 0}
+.ol-overviewmap .ol-overviewmap-map,.ol-overviewmap button {
+    display: inline-block}
+.ol-overviewmap .ol-overviewmap-map {
+    border: 1px solid #7b98bc;
+    height: 150px;
+    margin: 2px;
+    width: 150px}
+.ol-overviewmap: not(.ol-collapsed) button {
+    bottom: 1px;
+    left: 2px;
+    position: absolute}
+.ol-overviewmap.ol-collapsed .ol-overviewmap-map,.ol-overviewmap.ol-uncollapsible button {
+    display: none}
+.ol-overviewmap: not(.ol-collapsed) {
+    background: rgba(255,255,255,.8)}
+.ol-overviewmap-box {
+    border: 2px dotted rgba(0,60,136,.7)}
+#info {
+    position: absolute;
+    font-size: 0.7em;
+    bottom: 30px;
+    left: 10px;
+    background-color: lightgrey;
+    padding: 4px;
+    z-index: 100;
+}
+#site-title {
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+    color: #FFFFFF;
+    font-size: 34;
+    padding: 5;
+    //text-shadow: 3px 2px 2px #A1A1A1;
+    height: 100%;
+    padding-top: 10px;
+
+}
+.hide {
+    display: none;
+}
+
+.ol-popup {
+    display: none;
+    position: absolute;
+    background-color: white;
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+}
+.ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+}
+.ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+}
+.ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+}
+.ol-popup-closer:after {
+    //content: "✖";
+    content: "X";
+}
+#marker {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #088;
+        border-radius: 10px;
+        background-color: #0FF;
+        opacity: 0.5;
+      }
+      #dialog-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+          z-index: 109;
+        background: rgba(78, 99, 86, 0.65); // center center no-repeat;
+      }      
+#dialog-container {
+ 
+    position: absolute;
+    width: 80%;
+    //height: 80%;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    z-index: 110;
+    top: 40px;
+    left: 50px;
+    border-color: #4E6361;
+    border-style: solid;
+    border-width: 5px;
+}
+
+#login-dialog {
+    
+    vertical-align: middle;
+    text-align: center;
+    margin-right: 20px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+#dialog-closer {    
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    color: #000;
+    font-size: 2.0em;
+}
+
+/*********************
+* Login form
+***********************/
+/* Mask for background, by default is not display */
+#mask {
+    display: none;
+    background: #000;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    z-index: 110;
+}
+
+/* You can customize to your needs  */
+.login-popup {
+    display: none;
+    background: #333;
+    padding: 10px;
+    border: 2px solid #ddd;
+    float: left;
+    font-size: 1.2em;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 120;
+    box-shadow: 0px 0px 20px #999;
+    /* CSS3 */
+        -moz-box-shadow: 0px 0px 20px #999;
+    /* Firefox */
+        -webkit-box-shadow: 0px 0px 20px #999;
+    /* Safari, Chrome */
+	border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px;
+    /* Firefox */
+        -webkit-border-radius: 3px;
+    /* Safari, Chrome */;
+}
+
+img.btn_close {
+    float: right;
+    margin: -28px -28px 0 0;
+}
+
+fieldset {
+    border: none;
+}
+
+form.signin .textbox label {
+    display: block;
+    padding-bottom: 7px;
+}
+
+form.signin .textbox span {
+    display: block;
+}
+
+form.signin p, form.signin span {
+    color: #999;
+    font-size: 11px;
+    line-height: 18px;
+}
+
+form.signin .textbox input {
+    background: #666666;
+    border-bottom: 1px solid #333;
+    border-left: 1px solid #000;
+    border-right: 1px solid #333;
+    border-top: 1px solid #000;
+    color: #fff;
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    font: 13px Arial, Helvetica, sans-serif;
+    padding: 6px 6px 4px;
+    width: 200px;
+}
+
+form.signin input:-moz-placeholder {
+    color: #bbb;
+    text-shadow: 0 0 2px #000;
+}
+
+form.signin input::-webkit-input-placeholder {
+    color: #bbb;
+    text-shadow: 0 0 2px #000;
+}
+
+.button {
+    background: -moz-linear-gradient(center top, #f3f3f3, #dddddd);
+    background: -webkit-gradient(linear, left top, left bottom, from(#f3f3f3), to(#dddddd));
+    background: -o-linear-gradient(top, #f3f3f3, #dddddd);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#f3f3f3', EndColorStr='#dddddd');
+    border-color: #000;
+    border-width: 1px;
+    border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    color: #333;
+    cursor: pointer;
+    display: inline-block;
+    padding: 6px 6px 4px;
+    margin-top: 10px;
+    font: 12px;
+    width: 214px;
+}
+
+.button:hover {
+    background: #ddd;
+}
+
+.user-input {        
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px 10px 10px 10px;
+}
+
+.dialog h1 {  
+    font-family: Tahoma; 
+    font-size: 24px;
+    text-align: center; 
+    font-weight: bold;   
+    line-height: 2em;
+}
+
+.dialog p {  
+    font-family: Tahoma; 
+    font-size: 18px;
+    text-align: justify;  
+    line-height: 1.2em;   
+    margin-left: 5%;
+    margin-right: 5%;
+    padding-top: 2em;
+}
+.dialog form {
+        text-align: center;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    margin-left: auto;
+    margin-right: auto;
+}
+.dialog input {
+    
+    text-align: center;
+    border: 5px solid #f3f3f3; 
+    -webkit-box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    -moz-box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    padding: 15px;
+    background: rgba(255,255,255,0.5);
+    margin: 0 0 10px 0;
+}

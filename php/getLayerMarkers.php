@@ -12,9 +12,10 @@ if ($_POST) {
     // Get the user map data
     if (array_key_exists("data", $p) && !empty($p["data"])) {
         $data = json_decode($p['data'], true);
-        $status = updateShare($data['authtoken'], $data['ShareID'],  $data['coords'],  $data['time']);
-        if ($status) {
-            echo json_encode(array('status' => true));
+        $markers = getLayerMarkers($data['LayerID']);
+
+        if ($markers !== null) {
+            echo json_encode(array('markers' => $markers, 'status' => true));
         } else {
             echo json_encode(array('status' => false));
         }
@@ -23,3 +24,5 @@ if ($_POST) {
     //echo 'Error: Nothing POSTed.';
 }
 ?>
+
+

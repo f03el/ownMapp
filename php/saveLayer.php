@@ -12,9 +12,15 @@ if ($_POST) {
     // Get the user map data
     if (array_key_exists("data", $p) && !empty($p["data"])) {
         $data = json_decode($p['data'], true);
-        $status = setShare($data['authtoken'], $data['ShareID']);
-        if ($status) {
-            echo json_encode(array('status' => true));
+        $UserID = getUserIDFromAuthtokenData($data['authtoken']);
+        if ($UserID !== null) {
+            $layerInfo = $data['layerInfo'];
+            $LayerID = createNewLayer($UserID, $layerInfo['Type'], $layerInfo['Description']);
+            if ($LayerID !== null) {
+                echo json_encode(array('LayerID' => $LayerID, 'status' => true));
+            } else {
+                echo json_encode(array('status' => false));
+            }
         } else {
             echo json_encode(array('status' => false));
         }
@@ -23,5 +29,3 @@ if ($_POST) {
     //echo 'Error: Nothing POSTed.';
 }
 ?>
-
-
