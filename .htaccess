@@ -1,1 +1,2 @@
 RedirectMatch 404 "(?:.*)/(?:\.git|file_or_dir)(?:/.*)?$"
+DirectoryIndex index.php map.php index.php

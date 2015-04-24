@@ -3,7 +3,8 @@
 // Database location
 include('version.php');
 $docRoot = $_SERVER['DOCUMENT_ROOT'];
-define('DBFILE', $docRoot . '/data/ownmapp_v' . $VERSION . '.sqlite3');
+//define('DBFILE', $docRoot . '/data/ownmapp_v' . $VERSION . '.sqlite3');
+define('DBFILE', $docRoot . '/data/ownmapp.sqlite3');
 
 // Define marker types
 define('STATIC', 0);

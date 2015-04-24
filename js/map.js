@@ -35,7 +35,9 @@
             'click #cancel-layer': 'closeDialog',
             'click #open-help': 'helpDialog',
             'click #login-button-top,#open-settings': 'settingsDialog',
-            'click #auto-update-shares': 'toggleAutoShareUpdate'
+            'click #auto-update-shares': 'toggleAutoShareUpdate',
+            'click #open-log': 'openLog',
+            'click #start-simulation': 'simulateLocation'
         },
         initialize: function () {
             _(this).bindAll(
@@ -50,7 +52,6 @@
                     'degToRad',
                     'mod',
                     'locationUpdate',
-                    'cancelShareAutoUpdate',
                     'getURLParams',
                     'shareLocation',
                     'uniqID',
@@ -85,7 +86,9 @@
                     'getMyLocationLayerID',
                     'shareUserLayer',
                     'updateShareAcceptance',
-                    'toggleAutoShareUpdate'
+                    'toggleAutoShareUpdate',
+                    'openLog',
+                    'simulateLocation'
                     );
 
             this.createDataModel();
@@ -106,7 +109,7 @@
                 track: false
             };
             model.set('user', user);
-            
+
             /*
              * Shared layers (either a static or a user location layer) are 
              * specified by a ShareID. Anyone who knows the ShareID can access
@@ -115,14 +118,14 @@
              */
             var shares = [];
             model.set('shares', shares);
-            
+
             var share = {
                 ShareID: null,
                 time: null,
                 active: false
             };
             model.set('share', share);
-            
+
 
             /**************************
              * Create OpenLayers map
@@ -219,7 +222,7 @@
                 LayerID: ''
             });
             map.addLayer(userLocationLayer);
-            
+
             // Define marker icon style
             var markerStyle = new ol.style.Style({
                 image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
@@ -231,7 +234,7 @@
                 }))
             });
             model.set('markerStyle', markerStyle);
-            
+
             // Define marker icon style
             var shareStyle = new ol.style.Style({
                 image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
@@ -242,11 +245,11 @@
                     src: 'img/marker_blue_30px.png'
                 }))
             });
-            model.set('shareStyle', shareStyle);            
-            
+            model.set('shareStyle', shareStyle);
+
             // Define marker icon style
             var shareDynamicStyle = new ol.style.Style({
-               image: new ol.style.Circle({
+                image: new ol.style.Circle({
                     radius: 8,
                     fill: new ol.style.Fill({
                         color: '#FF0000'
@@ -258,6 +261,12 @@
                 })
             });
             model.set('shareDynamicStyle', shareDynamicStyle);
+
+            // Import simulated location data
+            var simulationData = JSON.parse('{"data":[{"coords":{"speed":1.7330950498580933,"accuracy":5,"altitudeAccuracy":8,"altitude":238,"longitude":5.868668798362713,"heading":67.5,"latitude":45.64444874417562},"timestamp":1394788264972},{"coords":{"speed":1.9535436630249023,"accuracy":5,"altitudeAccuracy":8,"altitude":238,"longitude":5.868715401744348,"heading":69.609375,"latitude":45.64446391542036},"timestamp":1394788266115},{"coords":{"speed":2.1882569789886475,"accuracy":10,"altitudeAccuracy":8,"altitude":238,"longitude":5.868768962105614,"heading":67.5,"latitude":45.644484995906836},"timestamp":1394788267107},{"coords":{"speed":2.4942498207092285,"accuracy":5,"altitudeAccuracy":6,"altitude":237,"longitude":5.868825791409117,"heading":68.5546875,"latitude":45.64450435810316},"timestamp":1394788267959},{"coords":{"speed":2.7581217288970947,"accuracy":5,"altitudeAccuracy":6,"altitude":237,"longitude":5.868881698703271,"heading":69.609375,"latitude":45.64452149909515},"timestamp":1394788268964},{"coords":{"speed":3.3746347427368164,"accuracy":5,"altitudeAccuracy":6,"altitude":236,"longitude":5.868938528006774,"heading":70.3125,"latitude":45.644536712249405},"timestamp":1394788270116},{"coords":{"speed":3.597411870956421,"accuracy":5,"altitudeAccuracy":6,"altitude":236,"longitude":5.868992004549009,"heading":74.8828125,"latitude":45.644547943999655},"timestamp":1394788271158},{"coords":{"speed":3.6382505893707275,"accuracy":5,"altitudeAccuracy":6,"altitude":236,"longitude":5.869038775568706,"heading":73.828125,"latitude":45.64456005584974},"timestamp":1394788271893},{"coords":{"speed":3.65671443939209,"accuracy":5,"altitudeAccuracy":6,"altitude":236,"longitude":5.869091162463528,"heading":73.4765625,"latitude":45.644572335337884},"timestamp":1394788272903},{"coords":{"speed":3.7153592109680176,"accuracy":5,"altitudeAccuracy":6,"altitude":236,"longitude":5.869144219910604,"heading":73.125,"latitude":45.64458671030182},"timestamp":1394788273914},{"coords":{"speed":3.8041043281555176,"accuracy":5,"altitudeAccuracy":4,"altitude":236,"longitude":5.869205072527629,"heading":72.421875,"latitude":45.64460313883204},"timestamp":1394788274901},{"coords":{"speed":3.9588162899017334,"accuracy":5,"altitudeAccuracy":4,"altitude":236,"longitude":5.869268858810765,"heading":72.421875,"latitude":45.64461990263838},"timestamp":1394788276140},{"coords":{"speed":4.152309417724609,"accuracy":5,"altitudeAccuracy":4,"altitude":235,"longitude":5.869351252918941,"heading":78.046875,"latitude":45.64466122542102},"timestamp":1394788276948},{"coords":{"speed":4.49971866607666,"accuracy":5,"altitudeAccuracy":6,"altitude":236,"longitude":5.869433479389054,"heading":79.8046875,"latitude":45.64467040360499},"timestamp":1394788277892},{"coords":{"speed":4.824056148529053,"accuracy":5,"altitudeAccuracy":6,"altitude":235,"longitude":5.869504055013758,"heading":91.40625,"latitude":45.64466089014489},"timestamp":1394788279211},{"coords":{"speed":5.269814491271973,"accuracy":10,"altitudeAccuracy":6,"altitude":235,"longitude":5.869575049733621,"heading":91.40625,"latitude":45.64465967476893},"timestamp":1394788279898},{"coords":{"speed":5.4861016273498535,"accuracy":5,"altitudeAccuracy":6,"altitude":235,"longitude":5.86963213049422,"heading":95.2734375,"latitude":45.64465091568012},"timestamp":1394788280935},{"coords":{"speed":5.380503177642822,"accuracy":5,"altitudeAccuracy":6,"altitude":235,"longitude":5.869714859878523,"heading":75.5859375,"latitude":45.64468792178262},"timestamp":1394788281930},{"coords":{"speed":5.276519775390625,"accuracy":5,"altitudeAccuracy":6,"altitude":234,"longitude":5.869746124377353,"heading":55.1953125,"latitude":45.64467706721801},"timestamp":1394788282909},{"coords":{"speed":5.212399482727051,"accuracy":5,"altitudeAccuracy":6,"altitude":232,"longitude":5.8697939850444625,"heading":49.5703125,"latitude":45.64467899505574},"timestamp":1394788284221},{"coords":{"speed":5.174651622772217,"accuracy":5,"altitudeAccuracy":6,"altitude":232,"longitude":5.869789123540623,"heading":18.984375,"latitude":45.64469378911484},"timestamp":1394788284924},{"coords":{"speed":5.211904525756836,"accuracy":5,"altitudeAccuracy":4,"altitude":232,"longitude":5.869806222623093,"heading":10.1953125,"latitude":45.64473896757294},"timestamp":1394788286251},{"coords":{"speed":5.254780292510986,"accuracy":5,"altitudeAccuracy":4,"altitude":233,"longitude":5.86982952431391,"heading":18.6328125,"latitude":45.64478381075491},"timestamp":1394788286927},{"coords":{"speed":5.329030513763428,"accuracy":5,"altitudeAccuracy":4,"altitude":232,"longitude":5.869875792419417,"heading":33.75,"latitude":45.644830078860416},"timestamp":1394788288221},{"coords":{"speed":5.384955883026123,"accuracy":5,"altitudeAccuracy":4,"altitude":232,"longitude":5.869927508761985,"heading":46.7578125,"latitude":45.64486025371183},"timestamp":1394788288935},{"coords":{"speed":5.309582233428955,"accuracy":5,"altitudeAccuracy":4,"altitude":232,"longitude":5.869972854858143,"heading":47.109375,"latitude":45.644890596201314},"timestamp":1394788290178},{"coords":{"speed":5.250724792480469,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.870029265066488,"heading":46.40625,"latitude":45.644932673355235},"timestamp":1394788290890},{"coords":{"speed":5.3057990074157715,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.870077712466819,"heading":39.375,"latitude":45.644970224281444},"timestamp":1394788291884},{"coords":{"speed":5.431822299957275,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.870133116846783,"heading":43.59375,"latitude":45.6450097449549},"timestamp":1394788292885},{"coords":{"speed":5.542125225067139,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.870186509569986,"heading":43.59375,"latitude":45.645047421609654},"timestamp":1394788294100},{"coords":{"speed":5.647174835205078,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.870246104901535,"heading":42.890625,"latitude":45.645093647805645},"timestamp":1394788295157},{"coords":{"speed":5.735793590545654,"accuracy":5,"altitudeAccuracy":6,"altitude":230,"longitude":5.870298156520231,"heading":42.5390625,"latitude":45.64514368776758},"timestamp":1394788296124},{"coords":{"speed":5.809989929199219,"accuracy":5,"altitudeAccuracy":6,"altitude":230,"longitude":5.870346436282499,"heading":43.59375,"latitude":45.64519154843469},"timestamp":1394788296960},{"coords":{"speed":5.877871036529541,"accuracy":5,"altitudeAccuracy":6,"altitude":228,"longitude":5.87034755932109,"heading":42.75193405151367,"latitude":45.645270362475216},"timestamp":1394788298177},{"coords":{"speed":5.937166690826416,"accuracy":5,"altitudeAccuracy":6,"altitude":228,"longitude":5.870402806867787,"heading":42.75193405151367,"latitude":45.645312142096095},"timestamp":1394788298898},{"coords":{"speed":6.071393966674805,"accuracy":5,"altitudeAccuracy":6,"altitude":229,"longitude":5.870464520921814,"heading":43.183074951171875,"latitude":45.64535851937182},"timestamp":1394788299897},{"coords":{"speed":6.329115390777588,"accuracy":5,"altitudeAccuracy":6,"altitude":230,"longitude":5.8705368384107715,"heading":43.183074951171875,"latitude":45.645412389093565},"timestamp":1394788300957},{"coords":{"speed":6.581554889678955,"accuracy":5,"altitudeAccuracy":6,"altitude":229,"longitude":5.870600162706978,"heading":43.183074951171875,"latitude":45.64545955929912},"timestamp":1394788302211},{"coords":{"speed":6.605470180511475,"accuracy":5,"altitudeAccuracy":6,"altitude":230,"longitude":5.870657211053185,"heading":43.183074951171875,"latitude":45.64550205482465},"timestamp":1394788302917},{"coords":{"speed":6.623170375823975,"accuracy":5,"altitudeAccuracy":4,"altitude":229,"longitude":5.870713613403495,"heading":43.183074951171875,"latitude":45.64554406917767},"timestamp":1394788303929},{"coords":{"speed":6.645580768585205,"accuracy":5,"altitudeAccuracy":4,"altitude":229,"longitude":5.870773011629353,"heading":43.183074951171875,"latitude":45.64558831489415},"timestamp":1394788304902},{"coords":{"speed":6.663600444793701,"accuracy":5,"altitudeAccuracy":4,"altitude":229,"longitude":5.87083890910435,"heading":43.183074951171875,"latitude":45.645637401898654},"timestamp":1394788306035},{"coords":{"speed":6.664675712585449,"accuracy":5,"altitudeAccuracy":6,"altitude":229,"longitude":5.870890033475007,"heading":43.183074951171875,"latitude":45.64567548463474},"timestamp":1394788307080},{"coords":{"speed":6.6489081382751465,"accuracy":5,"altitudeAccuracy":6,"altitude":228,"longitude":5.870943189474929,"heading":43.183074951171875,"latitude":45.645715080460064},"timestamp":1394788308211},{"coords":{"speed":6.551820755004883,"accuracy":5,"altitudeAccuracy":6,"altitude":228,"longitude":5.871005613698799,"heading":43.183074951171875,"latitude":45.64576158014743},"timestamp":1394788308904},{"coords":{"speed":6.467689514160156,"accuracy":5,"altitudeAccuracy":6,"altitude":229,"longitude":5.871058030061249,"heading":43.183074951171875,"latitude":45.64580062501799},"timestamp":1394788310161},{"coords":{"speed":6.3997955322265625,"accuracy":5,"altitudeAccuracy":6,"altitude":229,"longitude":5.871062579208228,"heading":43.183074951171875,"latitude":45.64580401381376},"timestamp":1394788310957},{"coords":{"speed":5.799798488616943,"accuracy":5,"altitudeAccuracy":6,"altitude":230,"longitude":5.8710817079554545,"heading":43.183074951171875,"latitude":45.64581826277647},"timestamp":1394788312036},{"coords":{"speed":4.424941062927246,"accuracy":5,"altitudeAccuracy":6,"altitude":230,"longitude":5.871121835629857,"heading":175.4296875,"latitude":45.645828271551544},"timestamp":1394788312951},{"coords":{"speed":4.3496222496032715,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.8710026017471595,"heading":176.484375,"latitude":45.645752236602775},"timestamp":1394788315227},{"coords":{"speed":5.076380252838135,"accuracy":5,"altitudeAccuracy":6,"altitude":232,"longitude":5.871189236646398,"heading":176.1328125,"latitude":45.64553692475487},"timestamp":1394788316970},{"coords":{"speed":5.102786064147949,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.871200384577616,"heading":171.2109375,"latitude":45.64548554368843},"timestamp":1394788317965},{"coords":{"speed":4.705626964569092,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.871210945775612,"heading":164.1796875,"latitude":45.645453105723156},"timestamp":1394788318956},{"coords":{"speed":4.378190040588379,"accuracy":5,"altitudeAccuracy":6,"altitude":231,"longitude":5.87124749087344,"heading":126.2109375,"latitude":45.645433282522156},"timestamp":1394788320197},{"coords":{"speed":4.208680152893066,"accuracy":5,"altitudeAccuracy":6,"altitude":233,"longitude":5.871283365419014,"heading":125.859375,"latitude":45.6454103999265},"timestamp":1394788320894},{"coords":{"speed":4.072604179382324,"accuracy":5,"altitudeAccuracy":6,"altitude":233,"longitude":5.871314043184622,"heading":103.359375,"latitude":45.645410819021656},"timestamp":1394788322169},{"coords":{"speed":3.7680623531341553,"accuracy":5,"altitudeAccuracy":6,"altitude":234,"longitude":5.871355114510163,"heading":92.4609375,"latitude":45.645418111277415},"timestamp":1394788322898},{"coords":{"speed":3.537794351577759,"accuracy":10,"altitudeAccuracy":6,"altitude":234,"longitude":5.871393922721847,"heading":92.4609375,"latitude":45.64541693781097},"timestamp":1394788323968},{"coords":{"speed":3.3741507530212402,"accuracy":10,"altitudeAccuracy":6,"altitude":234,"longitude":5.8714455552453835,"heading":75.5859375,"latitude":45.645444011358215},"timestamp":1394788324896},{"coords":{"speed":3.3729660511016846,"accuracy":10,"altitudeAccuracy":6,"altitude":235,"longitude":5.87150791660498,"heading":70.3125,"latitude":45.64547209073384},"timestamp":1394788325971},{"coords":{"speed":3.463883876800537,"accuracy":10,"altitudeAccuracy":6,"altitude":235,"longitude":5.871554352348551,"heading":70.3125,"latitude":45.64548374157925},"timestamp":1394788327122},{"coords":{"speed":3.5247886180877686,"accuracy":10,"altitudeAccuracy":6,"altitude":235,"longitude":5.871567260479435,"heading":67.1484375,"latitude":45.645496733529164},"timestamp":1394788328164},{"coords":{"speed":3.455146551132202,"accuracy":10,"altitudeAccuracy":6,"altitude":235,"longitude":5.871608583262071,"heading":68.90625,"latitude":45.64550293613751},"timestamp":1394788328985},{"coords":{"speed":3.382997989654541,"accuracy":10,"altitudeAccuracy":8,"altitude":236,"longitude":5.871640518313154,"heading":78.75,"latitude":45.6454965658911},"timestamp":1394788329900},{"coords":{"speed":3.242330312728882,"accuracy":10,"altitudeAccuracy":8,"altitude":236,"longitude":5.871667759498462,"heading":92.4609375,"latitude":45.64548562750746},"timestamp":1394788331120},{"coords":{"speed":3.074465274810791,"accuracy":10,"altitudeAccuracy":8,"altitude":236,"longitude":5.871691312646374,"heading":110.0390625,"latitude":45.645468402696444},"timestamp":1394788332219}]}');
+            window.console.log('simulationData: ' + JSON.stringify(simulationData.data));
+            model.set('simulationData', simulationData.data);
+            model.set('simulatingLocation', false);
 
             //Save objects to model
             model.set('view', view);
@@ -273,9 +282,10 @@
             model.set('initialShareCenter', true);
             model.set('previousM', 0);
             model.set('deltaMean', 10000);  // the geolocation sampling period mean in ms
-            model.set('updateInterval', 30); // seconds
-            model.set('sharesUpdateInterval', 30); // seconds
+            model.set('updateInterval', 10); // seconds
+            model.set('sharesUpdateInterval', 15); // seconds
             model.set('lastLocUpload', (new Date()).getTime());
+            model.set('autoUpdateShareState', true);
         },
         /*
          * Reset layers menu to the minimum default state
@@ -283,14 +293,18 @@
          */
         resetUserLayersMenu: function () {
             var layerMenu = $('#layer-menu').children('ul');
+            var label = 'Enable auto-update';
+            if (this.model.get('autoUpdateShareState')) {
+                label = 'Disable auto-update';
+            }
             $(layerMenu).html('');
             layerMenu.append('\n\
                 <li><a href="#" id="add-layer">Add layer...</a></li> \n\
-                ');   
+                ');
             $('#shares-menu').children('ul').html('');
             $('#shares-menu').children('ul').append('\n\
-                <li><a href="#" id="auto-update-shares">Auto update shares</a></li> \n\
-                ');   
+                <li><a href="#" id="auto-update-shares">' + label + '</a></li> \n\
+                ');
         },
         /*
          *  Add layer to menu. DOM element ID is LayerID, the link text is the 
@@ -310,16 +324,16 @@
                     var shareLinkLabel = 'Share';
                     if (userLayer.ShareID !== null) {
                         shareLinkLabel = 'Stop sharing';// userLayer.ShareID;
-                    } 
+                    }
                     var layerMenu = $('#layer-menu').children('ul');
                     layerMenu.append('\n\
-                        <li class="item-has-children" id="'+LayerID+'"> \n\
-                            <a href="#">'+userLayer.Description+'</a> \n\
+                        <li class="item-has-children" id="' + LayerID + '"> \n\
+                            <a href="#">' + userLayer.Description + '</a> \n\
                             <ul class="sub-menu"> \n\
                                 <li><a href="#" class="control-button layer-visibility">Hide</a></li> \n\
-                                <li><a href="#" class="control-button layer-share" id="share-layer-'+LayerID+'">'+shareLinkLabel+'</a></li> \n\
-                                <li><a href="#" class="control-button layer-delete" id="delete-layer-'+LayerID+'">Delete</a></li> \n\
-                                <li><a href="#" class="control-button layer-add-marker" id="add-marker-'+LayerID+'">Add marker...</a></li> \n\
+                                <li><a href="#" class="control-button layer-share" id="share-layer-' + LayerID + '">' + shareLinkLabel + '</a></li> \n\
+                                <li><a href="#" class="control-button layer-delete" id="delete-layer-' + LayerID + '">Delete</a></li> \n\
+                                <li><a href="#" class="control-button layer-add-marker" id="add-marker-' + LayerID + '">Add marker...</a></li> \n\
                             </ul> \n\
                         </li> <!-- item-has-children --> \n\
                         ');
@@ -351,7 +365,7 @@
                                 break; // try the next marker layer
                             }
                         }
-                    }                   
+                    }
                     this.refreshLateralMenu();
                     return;
                 }
@@ -496,13 +510,24 @@
                             name: marker.Description
                         });
                         if (marker.Type === 'Dynamic') {
-                             newMapMarker.setStyle(this.model.get('shareDynamicStyle'));
+                            newMapMarker.setStyle(this.model.get('shareDynamicStyle'));
+                            var view = this.model.get('view');
+                            var handle = this;
+                            if (handle.model.get('initialShareCenter')) {
+                                view.setCenter([parseFloat(marker.Lat), parseFloat(marker.Lon)]);
+                                handle.model.set('initialShareCenter', false);
+                            }
+                            if (handle.model.get('initialShareZoom') === true) {
+                                view.setZoom(16);
+                                handle.model.set('initialShareZoom', false);
+                            } else {
+                                //view.setZoom(view.getZoom());
+                            }
                         } else {
                             newMapMarker.setStyle(this.model.get('shareStyle'));
                         }
                         newMapMarker.setId(marker.MarkerID);
                         newLayerFeatures.push(newMapMarker);
-
                     }
 
                     var newLayerSource = new ol.source.Vector({
@@ -514,8 +539,8 @@
                         type: 'share',
                         LayerID: share.ShareID
                     });
-                    map.addLayer(newLayer);   
-                    window.console.log('adding layer to map: '+JSON.stringify(newLayer.get('name')));
+                    map.addLayer(newLayer);
+                    window.console.log('adding layer to map: ' + JSON.stringify(newLayer.get('name')));
                 }
             }
             this.model.set('map', map);
@@ -558,7 +583,7 @@
                         this.shareLocation();
                     }
                 }
-                
+
                 if (cookieData.hasOwnProperty('authtoken')) {
                     var authtoken = cookieData.authtoken;
                     this.model.set('authtoken', authtoken);
@@ -634,11 +659,16 @@
             if (user.locationData.length > 10) {
                 user.locationData.shift(); // Only keep the 10 most recent locations
             }
+            console.log('updated location: ' + JSON.stringify(user));
             handle.model.set('user', user);
             //Only sending location data to server if explicitly sharing
-            if (handle.model.get('share').active && (locData.updateTime - handle.model.get('lastLocUpload'))>1000*handle.model.get('updateInterval')) {
+            handle.log('location update (' + locData.lat + ',' + locData.lon + ')');
+            if (handle.model.get('share').active && (locData.updateTime - handle.model.get('lastLocUpload')) > 1000 * handle.model.get('updateInterval')) {
+                console.log('updateTime: ' + locData.updateTime + ', lastLocUpload: ' + handle.model.get('lastLocUpload'));
                 $('#info').append('<br />Sending update...');
+                handle.log('UPLOADING (' + locData.lat + ',' + locData.lon + ')');
                 handle.model.set('lastLocUpload', (new Date()).getTime());
+                handle.log('lastLocUpload: ' + handle.model.get('lastLocUpload'));
                 handle.updateShare();
             }
             handle.updateCookie();
@@ -657,7 +687,9 @@
             if (!user.track) {
                 $("#tracking-info").css('display', 'block');
                 $("#toggle-tracking").html('Tracking...');
-                geolocation.setTracking(true); // Start position tracking
+                if (!this.model.get('simulatingLocation')) {
+                    geolocation.setTracking(true); // Start position tracking
+                }
                 map.on('postcompose', this.render);
                 map.render();
                 user.track = true;
@@ -687,7 +719,7 @@
             var previous = fCoords[fCoords.length - 1];
             var prevHeading = previous && previous[2];
             if (prevHeading) {
-                var headingDiff = heading - mod(prevHeading);
+                var headingDiff = heading - this.mod(prevHeading);
 
                 // force the rotation change to be less than 180°
                 if (Math.abs(headingDiff) > Math.PI) {
@@ -710,7 +742,7 @@
 
             var viewportWidth = $(window).width();
             var viewportHeight = $(window).height();
-            $("div.map").css('height', viewportHeight - 75);
+            $("div.map").css('height', viewportHeight);
             $("div.map").css('width', viewportWidth);
             this.model.get('map').updateSize();
         },
@@ -800,8 +832,8 @@
         },
         shareLocation: function () {
             var shareData = this.model.get('share');
-            if (!shareData.active) {  
-                if (shareData.ShareID !== null && 0) {
+            if (!shareData.active) {
+                if (shareData.ShareID !== null) {
                     var ShareID = shareData.ShareID;
                 } else {
                     var ShareID = this.uniqID();
@@ -825,7 +857,7 @@
                 $('#share-location').html('Stop Sharing');
                 $('#share-info').slideDown('fast');
                 window.console.log('shareID mailto: ' + this.model.get('share').ShareID);
-                $('#share-url').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + window.location.origin + '/index.php?ShareID=' + this.model.get('share').ShareID); // + "%26autoupdate=60");
+                $('#share-url').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + window.location.origin + '/map.php?ShareID=' + this.model.get('share').ShareID); // + "%26autoupdate=60");
                 this.updateCookie();
 
             } else {
@@ -928,14 +960,17 @@
             this.createLayer();
         },
         removeShare: function (event) {
-            var answer = confirm("Remove share?"); if (!answer) { return; }
+            var answer = confirm("Remove share?");
+            if (!answer) {
+                return;
+            }
             var ShareID = event.target.id;
             ShareID = ShareID.substr(13); // extract the ShareID from the DOM element ID
             var data = {
                 authtoken: this.model.get('authtoken'),
                 ShareID: ShareID
             };
-             var handle = this;
+            var handle = this;
             this.queryServer(data, 'removeShare.php', function (response) {
                 var result = JSON.parse(response);
                 if (result.status) {
@@ -946,14 +981,17 @@
             });
         },
         deleteUserLayer: function (event) {
-            var answer = confirm("Delete layer?"); if (!answer) { return; }
+            var answer = confirm("Delete layer?");
+            if (!answer) {
+                return;
+            }
             var LayerID = event.target.id;
             LayerID = LayerID.substr(13); // extract the LayerID from the DOM element ID
             var data = {
                 authtoken: this.model.get('authtoken'),
                 LayerID: LayerID
             };
-             var handle = this;
+            var handle = this;
             this.queryServer(data, 'deleteLayer.php', function (response) {
                 var result = JSON.parse(response);
                 if (result.status) {
@@ -1076,6 +1114,7 @@
         loginDialog: function () {
             this.closeDialog();
             $('#login-box').fadeIn(300);
+            $('#username').focus();
             //Set the center alignment padding + border see css style
             var popMargTop = ($('#login-box').height() + 24) / 2;
             var popMargLeft = ($('#login-box').width() + 24) / 2;
@@ -1106,8 +1145,12 @@
                 var result = JSON.parse(response);
                 if (result.valid) {
                     handle.setAuthToken(result.authtoken);
+                    var user = handle.model.get('user');
+                    user.name = result.displayname;
+                    handle.model.set('user', user);
                     handle.userControlConfig('authenticated');
                     handle.getUserData();
+                    window.location.reload();
                 } else {
                     alert('Incorrect username/password.');
                 }
@@ -1217,23 +1260,35 @@
             }
             return null;
         },
-        toggleAutoShareUpdate: function () {
-            if (this.model.has('sharesUpdateID')) {
-                this.cancelShareAutoUpdate();
-                //console.log('canceled auto update of shares');
+        toggleAutoShareUpdate: function (enabled) {
+            var autoShareState;
+            if (typeof (enabled) === 'undefined') {
+                if (this.model.has('sharesUpdateID')) {
+                    autoShareState = false;
+                } else {
+                    autoShareState = true;
+                }
             } else {
+                if (this.model.has('sharesUpdateID') && !enabled) {
+                    autoShareState = false;
+                }
+                if (!this.model.has('sharesUpdateID') && enabled) {
+                    autoShareState = true;
+                }
+            }
+            if (autoShareState) {
                 var handle = this;
                 this.model.set('sharesUpdateID', setInterval(function () {
                     handle.getUserData();
                 }, 1000 * this.model.get('sharesUpdateInterval')));
-                //console.log('Initiated auto update of shares')
-            }
-        },
-        cancelShareAutoUpdate: function () {
-            if (this.model.has('sharesUpdateID')) {
+                $('#auto-update-shares').html('Disable auto-update');
+
+            } else {
                 clearInterval(this.model.get('sharesUpdateID'));
                 this.model.unset('sharesUpdateID');
+                $('#auto-update-shares').html('Enable auto-update');
             }
+            this.model.set('autoUpdateShareState', autoShareState);
         },
         getUserData: function () {
             var newShareID = $('#new-share-id').html(); //get share ID for share in URL
@@ -1261,7 +1316,7 @@
                             var answer = confirm(shares[i].OwnerName + ' wants to share ' + shares[i].Description + '. Add layer?');
                             if (answer) {
                                 shares[i].Accepted = 1;
-                                handle.toggleAutoShareUpdate();
+                                handle.toggleAutoShareUpdate(true);
                             } else {
                                 shares[i].Accepted = 2;
                             }
@@ -1289,7 +1344,7 @@
             }
             var data = {
                 authtoken: this.model.get('authtoken'),
-                shareData: shareData                
+                shareData: shareData
             };
             //window.console.log('data: ' + JSON.stringify(data));
             this.queryServer(data, 'updateShareAcceptance.php', function (response) {
@@ -1297,7 +1352,7 @@
                 var result = JSON.parse(response);
                 if (result.status) {
                     //window.console.log('Share acceptance updated successfully.');
-                } else {                    
+                } else {
                     window.console.log('Share acceptance update failed.');
                 }
             });
@@ -1418,7 +1473,9 @@
             }
         },
         centerMarker: function (markerID) {
+            window.console.log('center on marker: ' + markerID);
             $('#cd-menu-trigger').click(); // Close menu
+            var targetCoords = null;
             var map = this.model.get('map');
             //window.console.log('Destination markerID: ' + markerID);
             var user = this.model.get('user');
@@ -1428,35 +1485,51 @@
                 for (var k = 0; k < markers.length; k++) {
                     var marker = markers[k];
                     if (marker.MarkerID === markerID) {
-                        var view = map.getView();
-                        var duration = 2000;
-                        var start = +new Date();
-                        var pan = ol.animation.pan({
-                            duration: duration,
-                            source: view.getCenter(),
-                            start: start
-                        });
-                        var bounce = ol.animation.bounce({
-                            duration: duration,
-                            resolution: 4 * view.getResolution(),
-                            start: start
-                        });
-                        var zoom = ol.animation.zoom({
-                            duration: duration,
-                            resolution: view.getResolution(),
-                            start: start
-                        });
-                        var rotate = ol.animation.rotate({
-                            duration: duration,
-                            rotation: 2 * 3.141592,
-                            start: start
-                        });
-                        map.beforeRender(pan, zoom);
-                        view.setCenter([parseFloat(marker.Lat), parseFloat(marker.Lon)]);
-                        view.setResolution(view.getResolution() / 2);
-
+                        targetCoords = [parseFloat(marker.Lat), parseFloat(marker.Lon)];
                     }
                 }
+            }
+            if (targetCoords === null) {
+                var shares = this.model.get('shares');
+                for (var i = 0; i < shares.length; i++) {
+                    if (parseInt(shares[i].Accepted) === 1) {
+                        for (var k = 0; k < shares[i].markers.length; k++) {
+                            var marker = shares[i].markers[k];
+                            if (marker.MarkerID === markerID) {
+                                targetCoords = [parseFloat(marker.Lat), parseFloat(marker.Lon)];
+                            }
+                        }
+                    }
+                }
+            }
+            if (targetCoords !== null) {
+                var view = map.getView();
+                var duration = 5000;
+                var start = +new Date();
+                var pan = ol.animation.pan({
+                    duration: duration,
+                    source: view.getCenter(),
+                    start: start
+                });
+                var bounce = ol.animation.bounce({
+                    duration: duration,
+                    resolution: 4 * view.getResolution(),
+                    start: start
+                });
+                var zoom = ol.animation.zoom({
+                    duration: duration,
+                    resolution: view.getResolution(),
+                    start: start
+                });
+                var rotate = ol.animation.rotate({
+                    duration: duration,
+                    rotation: 2 * 3.141592,
+                    start: start
+                });
+                map.beforeRender(pan, bounce, zoom);
+                view.setCenter(targetCoords);
+                //view.setResolution(view.getResolution() / 2);
+                view.setZoom(15);
             }
         },
         /*
@@ -1465,7 +1538,7 @@
          * @param {type} markerID
          * @returns {undefined}
          */
-        deleteMarker: function (markerID) {           
+        deleteMarker: function (markerID) {
             // Delete marker from server database
             var data = {
                 authtoken: this.model.get('authtoken'),
@@ -1515,12 +1588,12 @@
             var addMarkerLinkID = this.model.get('addMarkerLinkID');
             var LayerID = addMarkerLinkID.substr(11); //extract the LayerID from the "layer-add-LAYERID" DOM element ID
             var markerInfo = {
-                        LayerID: LayerID,
-                        Lat: coordinates[0],
-                        Lon: coordinates[1],
-                        Type: 'Static',
-                        Description: this.model.get('newMarkerDescription')
-                    };
+                LayerID: LayerID,
+                Lat: coordinates[0],
+                Lon: coordinates[1],
+                Type: 'Static',
+                Description: this.model.get('newMarkerDescription')
+            };
             this.saveMarker(markerInfo);
             this.stopMarker();
         },
@@ -1538,8 +1611,53 @@
             this.closeDialog();
             this.openDialog();
             $('#settings-dialog').fadeIn(300);
-        }
+        },
+        openLog: function () {
+            this.closeDialog();
+            this.openDialog();
+            $('#log-viewer').fadeIn(300);
+        },
+        log: function (msg) {
+            var timestamp = (new Date()).toISOString();
+            var curLog = $('#log-viewer').html();
+            $('#log-viewer').append('<p>' + timestamp + ': ' + msg + '</p>');
+        },
+        simulateLocation: function () {
+            var coordinates = this.model.get('simulationData');
 
+            var first = coordinates.shift();
+            this.simulatePositionChange(first);
+            var handle = this;
+            var prevDate = first.timestamp;
+            function geolocate() {
+                var position = coordinates.shift();
+                if (!position) {
+                    return;
+                }
+                var newDate = position.timestamp;
+                handle.simulatePositionChange(position);
+                window.setTimeout(function () {
+                    prevDate = newDate;
+                    geolocate();
+                }, (newDate - prevDate) / 0.5);
+            }
+            geolocate();
+            this.model.set('simulatingLocation', true);
+            $('#toggle-tracking').click(); // Simulate "Track me" button
+            this.closeDialog(); // Close menu
+        },
+        simulatePositionChange: function (position) {
+            var geolocation = this.model.get('geolocation');
+            var coords = position.coords;
+            geolocation.set('accuracy', coords.accuracy);
+            geolocation.set('heading', this.degToRad(coords.heading));
+            var position_ = [coords.longitude, coords.latitude];
+            var projectedPosition = ol.proj.transform(position_, 'EPSG:4326',
+                    'EPSG:3857');
+            geolocation.set('position', projectedPosition);
+            geolocation.set('speed', coords.speed);
+            geolocation.changed();
+        }
     });
     // Start the engines
     $(init);

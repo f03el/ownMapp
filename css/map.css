@@ -10,7 +10,7 @@
     right: 8px;
     position: absolute}
 .ol-scale-line {
-    background: #95b9e6;
+    background: #84a684; //#95b9e6;
     background: rgba(0,60,136,.3);
     border-radius: 4px;
     bottom: 8px;
@@ -215,7 +215,7 @@ button.ol-full-screen-true:after {
     //text-shadow: 3px 2px 2px #A1A1A1;
     height: 100%;
     padding-top: 10px;
-
+    display: none;
 }
 .hide {
     display: none;
@@ -329,7 +329,9 @@ button.ol-full-screen-true:after {
     opacity: 0.8;
     z-index: 110;
 }
-
+#login-button-top {
+    display: none;
+}
 /* You can customize to your needs  */
 .login-popup {
     display: none;
