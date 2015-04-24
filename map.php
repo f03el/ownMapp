@@ -130,7 +130,24 @@
                             <h1>Settings</h1>
                             <p>Start a simulation of location tracking for demo or testing purposes:                               
                                 <a href="#" id="start-simulation">Start simulation...</a>
-                            </p><p>                                
+                            </p><p> Reset password: <br>
+                            <form method="post" class="signin" action="#">
+                                <fieldset class="textbox">                                    
+                                    <label class="password">
+                                        <span>Current password</span>
+                                        <input id="current-password" name="currentpassword" value="" type="password" autocomplete="on" placeholder="Old password">
+                                    </label>
+                                    <label class="password">
+                                        <span>New password</span>
+                                        <input id="reset-password" name="resetpassword" value="" type="password" placeholder="UniquePassword!">
+                                    </label>
+                                    <label class="password">
+                                        <span>Verify new password</span>
+                                        <input id="reset-passwordcheck" name="resetpasswordcheck" value="" type="password" placeholder="UniquePassword!">
+                                    </label>
+                                    <button id="reset-password-submit" class="submit button" type="button">Reset Password</button>  
+                                </fieldset>
+                            </form>
                             </p>
                     </div>
                     <div class="hide" id="dialog-closer"><a href="#">X</a></div>

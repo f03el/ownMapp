@@ -356,6 +356,27 @@ function getUserIDFromAuthtokenData($authtoken) {
     }
 }
 
+function changePassword($authtoken, $oldPassword, $newPassword) {
+    try {
+        $db = openDB(DBFILE);
+        if ($db == null) {
+            return false;
+        }
+        $status = false;
+        $query = "UPDATE users SET password=\"" . $newPassword . "\" WHERE authtoken=\"" . $authtoken . "\" AND password=\"" . $oldPassword . "\"";
+        $result = $db->query($query); //->fetchAll();
+        if ($result->rowCount() > 0) {
+            $status = true;
+        }
+        closeDB($db);
+        return $status;
+    } catch (PDOException $e) {
+        // Print PDOException message
+        echo $e->getMessage();
+        return false;
+    }
+}
+
 function getUserInfo($UserID) {
     if (userExists($UserID)) {
         try {
@@ -527,13 +548,13 @@ function layerExists($LayerID) {
         foreach ($result as $row) {
             $numRows++;
         }
+        closeDB($db);
         //echo json_encode($result['NrRecords']);
         if ($numRows === 0) {
             return false;
         } else {
             return true;
         }
-        closeDB($db);
     } catch (PDOException $e) {
         // Print PDOException message
         echo $e->getMessage();

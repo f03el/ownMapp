@@ -26,6 +26,7 @@
             'click #login': 'verifyAccount',
             'click #anonymous-login': 'anonymousLogin',
             'click #register': 'registerAccount',
+            'click #reset-password-submit': 'resetPassword',
             'click #create-account': 'createAccount',
             'click #mymarkers-visibility': 'toggleLayerVisiblity',
             'click #dialog-closer': 'closeDialog',
@@ -1109,6 +1110,12 @@
             $('#dialog-container').hide();
             $('#dialog-container').children().hide();
             $('#mask, .login-popup').hide();
+            // Clear form fields
+            $('#passwordcheck').val('');
+            $('#password').val('');
+            $('#reset-passwordcheck').val('');
+            $('#reset-password').val('');
+            $('#current-password').val('');
 
         },
         loginDialog: function () {
@@ -1208,6 +1215,33 @@
 
             } else {
                 $('#passwordcheck').css('color', '#FF0000');
+                //alert('Passwords do not match!');
+            }
+        },
+        resetPassword: function () {            
+            var currentPassword = $('#current-password').val();
+            var newPassword = $('#reset-password').val();
+            var passwordcheck = $('#reset-passwordcheck').val();
+            if (newPassword === passwordcheck) {
+                this.closeDialog();
+                $('#reset-passwordcheck').css('color', '#FFFFFF');
+                var passwordChange = {
+                    authtoken: this.model.get('authtoken'),
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                };
+                
+                var handle = this;
+                this.queryServer(passwordChange, 'changePassword.php', function (response) {
+                    var result = JSON.parse(response);
+                    if (result.status) {
+                        alert('Password successfully changed.');
+                    } else {
+                        alert('Password change failed.');
+                    }
+                });
+            } else {
+                $('#reset-passwordcheck').css('color', '#FF0000');
                 //alert('Passwords do not match!');
             }
         },
