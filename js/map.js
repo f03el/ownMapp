@@ -831,6 +831,11 @@
             }
             return prefix + str;
         },
+        getURL: function () {
+            var url = document.location.href;
+            var rootURL = url.substring(0, url.lastIndexOf("/"));
+            return rootURL;
+        },
         shareLocation: function () {
             var shareData = this.model.get('share');
             if (!shareData.active) {
@@ -858,7 +863,8 @@
                 $('#share-location').html('Stop Sharing');
                 $('#share-info').slideDown('fast');
                 window.console.log('shareID mailto: ' + this.model.get('share').ShareID);
-                $('#share-url').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + window.location.origin + '/map.php?ShareID=' + this.model.get('share').ShareID); // + "%26autoupdate=60");
+                
+                $('#share-url').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + this.getURL() + '/map.php?ShareID=' + this.model.get('share').ShareID); // + "%26autoupdate=60");
                 this.updateCookie();
 
             } else {
@@ -1019,8 +1025,8 @@
                 this.openDialog();
                 //window.console.log('Layer info: ' + JSON.stringify(layer));
                 $('#share-layer-name').html(layer.Description);
-                $('#share-mailto-link').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + window.location.origin + '/map.php?ShareID=' + layer.ShareID);
-                $('#share-link').prop("href", window.location.origin + '/map.php?ShareID=' + layer.ShareID);
+                $('#share-mailto-link').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + this.getURL() + '/map.php?ShareID=' + layer.ShareID);
+                $('#share-link').prop("href", this.getURL() + '/map.php?ShareID=' + layer.ShareID);
                 $('#share-link-dialog').fadeIn(300);
             }
         },

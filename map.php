@@ -172,7 +172,7 @@
                     <ul class="sub-menu">
                         <li><a href="#" id="share-location">Start sharing...</a></li>
                         <div id="share-info" class="hide">
-                            <a id="share-url" class="button green subbutton" href="">Share this link.</a>
+                            <a id="share-url" class="control-button" href="">Email share link</a>
                         </div>
                         <div id="shared-map" class="hide">
 
