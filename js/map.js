@@ -1019,8 +1019,8 @@
                 this.openDialog();
                 //window.console.log('Layer info: ' + JSON.stringify(layer));
                 $('#share-layer-name').html(layer.Description);
-                $('#share-mailto-link').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + window.location.origin + '/index.php?ShareID=' + layer.ShareID);
-                $('#share-link').prop("href", window.location.origin + '/index.php?ShareID=' + layer.ShareID);
+                $('#share-mailto-link').prop("href", "mailto:?subject=ownMapp%20Link%20&body=" + window.location.origin + '/map.php?ShareID=' + layer.ShareID);
+                $('#share-link').prop("href", window.location.origin + '/map.php?ShareID=' + layer.ShareID);
                 $('#share-link-dialog').fadeIn(300);
             }
         },
