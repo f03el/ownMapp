@@ -435,7 +435,9 @@ form.signin input::-webkit-input-placeholder {
     margin-right: auto;
     padding: 10px 10px 10px 10px;
 }
-
+.dialog {
+    margin-bottom: 2em;    
+}
 .dialog h1 {  
     font-family: Tahoma; 
     font-size: 24px;
@@ -447,7 +449,7 @@ form.signin input::-webkit-input-placeholder {
 .dialog p {  
     font-family: Tahoma; 
     font-size: 18px;
-    text-align: justify;  
+    text-align: center;  
     line-height: 1.2em;   
     margin-left: 5%;
     margin-right: 5%;

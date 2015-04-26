@@ -23,7 +23,7 @@
                     <li><a href="#" id="login-button-top">Login</a></li>
                 </ul>
             </nav>
-            <a id="cd-menu-trigger" href="#"><span class="cd-menu-text">Menu</span><span class="cd-menu-icon"></span></a>
+            <a id="cd-menu-trigger" href="#"><span class="cd-menu-text">Menu</span><span class="cd-menu-icon hide"></span></a>
         </header>
         <main class="cd-main-content">
 
@@ -107,9 +107,10 @@
                             <button id="cancel-marker" class="submit button" type="button">Cancel</button>
                             </form>
                     </div>
+                    <div class="hide dialog" id="alert-dialog"></div>
                     <div class="hide dialog" id="help-dialog">
                             <h1>ownMapp Help</h1>
-                            <p><a href="/">ownMapp</a> allows you to track your current location, save markers of static locations,
+                            <p><a href="https://ownmapp.com">ownMapp</a> allows you to track your current location, save markers of static locations,
                                 and share these locations with others. 
                             </p><p>
                                 You can create a user account or use the anonymous default. The advantage of the 

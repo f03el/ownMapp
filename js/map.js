@@ -2,13 +2,13 @@
 (function ($) {
     function init() {
         var model = new Backbone.Model();
-        var locator = new Locator({
+        var ownmapp = new ownMapp({
             model: model,
             el: $('body')
         });
     }
 
-    var Locator = Backbone.View.extend({
+    var ownMapp = Backbone.View.extend({
         events: {
             'click #toggle-tracking': 'toggleLocation',
             'click #tracking-info': 'toggleLocation',
@@ -206,9 +206,9 @@
 
             // Listen to position changes
             geolocation.on('change', this.locationUpdate);
-
+            var handle = this;
             geolocation.on('error', function () {
-                alert('geolocation error');
+                handle.alertDialog('geolocation error');
                 // FIXME we should remove the coordinates in positions
             });
 
@@ -559,6 +559,7 @@
             // Configure displayed controls            
             $('#logout-menu-item').hide();
             $('#layer-menu').hide();
+            $('#cd-menu-trigger').hide();
 
             // Load previously saved model data
             this.loadCookie();
@@ -1112,7 +1113,10 @@
         },
         closeDialog: function () {
             $('#mask').click(); // Close menu
+            $('#newpassword').css('color', '#FFFFFF');
             $('#passwordcheck').css('color', '#FFFFFF');
+            $('#displayname').css('color', '#FFFFFF');
+            $('#newusername').css('color', '#FFFFFF');
             $('#dialog-container').hide();
             $('#dialog-container').children().hide();
             $('#mask, .login-popup').hide();
@@ -1142,7 +1146,8 @@
             return false;
         },
         anonymousLogin: function () {
-            window.location.reload();
+            this.createAccount('anonymous');
+            //window.location.reload();
         },
         verifyAccount: function () {
             var username = $('#username').val();
@@ -1165,7 +1170,8 @@
                     handle.getUserData();
                     window.location.reload();
                 } else {
-                    alert('Incorrect username/password.');
+                    handle.alertDialog('Incorrect username/password.');
+                    handle.loginDialog();
                 }
             });
 
@@ -1196,9 +1202,24 @@
                 var password = $('#newpassword').val();
                 var passwordcheck = $('#passwordcheck').val();
             }
+            if (displayname.length < 1) {
+                $('#displayname').css('color', '#FF0000');
+                return;
+            }
+            if (username.length < 1) {
+                $('#newusername').css('color', '#FF0000');
+                return;
+            }
+            if (password.length < 1) {
+                $('#newpassword').css('color', '#FF0000');
+                return;
+            }
             if (password === passwordcheck) {
                 this.closeDialog();
+                $('#newpassword').css('color', '#FFFFFF');
                 $('#passwordcheck').css('color', '#FFFFFF');
+                $('#displayname').css('color', '#FFFFFF');
+                $('#newusername').css('color', '#FFFFFF');
                 var credentials = {
                     username: username,
                     password: password,
@@ -1215,7 +1236,7 @@
                         handle.userControlConfig('authenticated');
                         handle.getUserData();
                     } else {
-                        alert('Username already registered.');
+                        handle.alertDialog('Username already registered.');
                     }
                 });
 
@@ -1241,9 +1262,9 @@
                 this.queryServer(passwordChange, 'changePassword.php', function (response) {
                     var result = JSON.parse(response);
                     if (result.status) {
-                        alert('Password successfully changed.');
+                        handle.alertDialog('Password successfully changed.');
                     } else {
-                        alert('Password change failed.');
+                        handle.alertDialog('Password change failed.');
                     }
                 });
             } else {
@@ -1273,13 +1294,13 @@
                         handle.getUserData();
                     } else {
                         window.console.log('AuthToken invalid.');
-                        handle.createAccount('anonymous');
-                        //handle.userControlConfig('anonymous');
-                        // TODO: configure new temporary user
+                        handle.loginDialog();
+                        //handle.createAccount('anonymous');
                     }
                 });
             } else {
-                this.createAccount('anonymous');
+                this.loginDialog();
+                //this.createAccount('anonymous');
             }
         },
         getMyMarkersLayerID: function () {
@@ -1401,12 +1422,15 @@
             var user = this.model.get('user');
             switch (userState) {
                 case 'authenticated':
+                    $('#cd-menu-trigger').show();
                     $('#login-button-top').html(user.name);
                     $('#logout-menu-item').html('Logout ' + user.name);
                     $('#logout-menu-item').show();
                     $('#layer-menu').show();
                     $('#share-menu').show();
+                    $('#shares-menu').show();
                     $('#login-button-menu').hide();
+                    this.alertDialog('You are logged in as: ' + user.name + '.', 'Authenticated');
                     break;
                 case 'logout':
                     this.closeDialog();
@@ -1416,6 +1440,7 @@
                     $('#logout-menu-item').hide();
                     $('#layer-menu').hide();
                     $('#share-menu').hide();
+                    $('#shares-menu').hide();
                     $('#login-button-menu').show();
                     break;
                 default:
@@ -1428,6 +1453,7 @@
                 this.model.unset('authtoken');
                 this.userControlConfig('logout');
                 docCookies.removeItem("oMCookie");
+                window.location.reload();
             }
         },
         /*
@@ -1656,6 +1682,18 @@
             this.closeDialog();
             this.openDialog();
             $('#log-viewer').fadeIn(300);
+        },
+        alertDialog: function (msg, title) {
+            this.closeDialog();
+            this.openDialog();
+            if (typeof(title) === 'undefined') {
+                title = ' '; // Only one argument was given, which was the message
+            }
+            $('#alert-dialog').html('');
+            $('#alert-dialog').append('<h1>'+title+'</h1>');
+            $('#alert-dialog').append('<p>'+msg+'</p>');
+            $('#alert-dialog').fadeIn(300);
+            
         },
         log: function (msg) {
             var timestamp = (new Date()).toISOString();
