@@ -2,7 +2,7 @@
 
 // Database location
 include('version.php');
-$docRoot = $_SERVER['DOCUMENT_ROOT'];
+$docRoot = str_replace("\\", "/", realpath(dirname(__FILE__) . '/..'));
 //define('DBFILE', $docRoot . '/data/ownmapp_v' . $VERSION . '.sqlite3');
 define('DBFILE', $docRoot . '/data/ownmapp.sqlite3');
 
