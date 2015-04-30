@@ -93,9 +93,10 @@ function createAccount($username, $password, $displayname) {
             return null;
         }
         $uid = null;
-        $query = "SELECT * FROM users WHERE username=\"" . $username . "\"";
-        //$result = $db->query("SELECT COUNT(*) AS NrRecords FROM (".$query.")");
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM users WHERE username=:username");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $numRows = 0;
         foreach ($result as $row) {
             $numRows++;
@@ -138,11 +139,17 @@ function generateAuthToken($UserID) {
             return null;
         }
         $authtoken = newAuthToken();
-        $query = "UPDATE users SET authtoken=\"" . $authtoken . "\" WHERE UserID=\"" . $UserID . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("UPDATE users SET authtoken=:authtoken WHERE UserID=:UserID");
+        $stmt->bindParam(':authtoken', $authtoken);
+        $stmt->bindParam(':UserID', $UserID);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $authtime = time();
-        $query = "UPDATE users SET authtime=\"" . $authtime . "\" WHERE UserID=\"" . $UserID . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("UPDATE users SET authtime=:authtime WHERE UserID=:UserID");
+        $stmt->bindParam(':authtime', $authtime);
+        $stmt->bindParam(':UserID', $UserID);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         closeDB($db);
         return $authtoken;
     } catch (PDOException $e) {
@@ -158,8 +165,10 @@ function validateAuthToken($authtoken) {
         if ($db == null) {
             return array('displayname' => '', 'UserID' => '', 'valid' => false);
         }
-        $query = "SELECT * FROM users WHERE authtoken=\"" . $authtoken . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM users WHERE authtoken=:authtoken");
+        $stmt->bindParam(':authtoken', $authtoken);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $valid = false;
         foreach ($result as $row) {
             if ($authtoken === $row['authtoken']) {
@@ -193,13 +202,13 @@ function verifyAccount($username, $password) {
         if ($db == null) {
             return null;
         }
-        $query = "SELECT * FROM users WHERE username=\"" . $username . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM users WHERE username=:username");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $valid = false;
         $UserID = null;
         foreach ($result as $row) {
-
-
             if ($password === $row['password']) {
                 $valid = true;
                 $UserID = $row['UserID'];
@@ -227,8 +236,10 @@ function userExists($UserID) {
         if ($db == null) {
             return false;
         }
-        $query = "SELECT * FROM users WHERE UserID=\"" . $UserID . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM users WHERE UserID=:UserID");
+        $stmt->bindParam(':UserID', $UserID);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $numRows = 0;
         foreach ($result as $row) {
             $numRows++;
@@ -283,8 +294,10 @@ function getUserLayers($UserID) {
             if ($db == null) {
                 return null;
             }
-            $query = "SELECT * FROM layers WHERE UserID=\"" . $UserID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM layers WHERE UserID=:UserID");
+            $stmt->bindParam(':UserID', $UserID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             $layers = [];
             foreach ($result as $row) {
                 $layer = array('LayerID' => $row['LayerID'], 'ShareID' => $row['ShareID'], 'Type' => $row['Type'], 'Description' => $row['Description']);
@@ -300,37 +313,6 @@ function getUserLayers($UserID) {
     } else {
         return null;
     }
-
-//    if (userExists($UserID)) {
-//        try {
-//            $db = openDB(DBFILE);
-//            if ($db == null) {
-//                return null;
-//            }
-//            $query = "SELECT * FROM layers WHERE UserID=\"" . $UserID . "\"";
-//            $result = $db->query($query);
-//            $UserLayerID = null;
-//            $layers = array();
-//            foreach ($result as $row) {
-//                if ($row['Type'] === 'userLocation') {
-//                    $UserLayerID = $row['LayerID'];
-//                }
-//                if ($row['Description'] === 'MyMarkers') {
-//                    $MarkerLayerID = $row['LayerID'];
-//                }
-//                $layer = array('LayerID' => $row['LayerID'], 'Type' => $row['Type'], 'Description' => $row['Description']);
-//                $layers[] = $layer;
-//            }
-//            closeDB($db);
-//            return array('layers' => $layers, 'LayerID' => $UserLayerID, 'MarkerLayerID' => $MarkerLayerID);
-//        } catch (PDOException $e) {
-//            // Print PDOException message
-//            echo $e->getMessage();
-//            return null;
-//        }
-//    } else {
-//        return null;
-//    }
 }
 
 function getUserIDFromAuthtokenData($authtoken) {
@@ -340,8 +322,10 @@ function getUserIDFromAuthtokenData($authtoken) {
             return null;
         }
         $UserID = null;
-        $query = "SELECT * FROM users WHERE authtoken=\"" . $authtoken . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM users WHERE authtoken=:authtoken");
+        $stmt->bindParam(':authtoken', $authtoken);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         foreach ($result as $row) {
             if ($authtoken === $row['authtoken']) {
                 $UserID = $row['UserID'];
@@ -363,8 +347,12 @@ function changePassword($authtoken, $oldPassword, $newPassword) {
             return false;
         }
         $status = false;
-        $query = "UPDATE users SET password=\"" . $newPassword . "\" WHERE authtoken=\"" . $authtoken . "\" AND password=\"" . $oldPassword . "\"";
-        $result = $db->query($query); //->fetchAll();
+        $stmt = $db->prepare("UPDATE users SET password=:newPassword  WHERE authtoken=:authtoken AND password=:oldPassword");
+        $stmt->bindParam(':newPassword', $newPassword);
+        $stmt->bindParam(':authtoken', $authtoken);
+        $stmt->bindParam(':oldPassword', $oldPassword);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         if ($result->rowCount() > 0) {
             $status = true;
         }
@@ -384,8 +372,11 @@ function getUserInfo($UserID) {
             if ($db == null) {
                 return null;
             }
-            $query = "SELECT * FROM users WHERE UserID=\"" . $UserID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM users WHERE UserID=:UserID");
+            $stmt->bindParam(':UserID', $UserID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
+
             foreach ($result as $row) {
                 $userInfo = array('DisplayName' => $row['displayname']);
             }
@@ -408,20 +399,21 @@ function getShares($UserID, $newShareID) {
             if ($db == null) {
                 return null;
             }
-            // Update the rows with the TempID for new, unaccepted shares with the UserID
-            //$update = "UPDATE shares SET UserID=\"" . $UserID . "\" WHERE TempID=\"" . $TempID . "\"";
-            //$result = $db->query($update);
             $shareAreadyAdded = false;
             // Retrieve the shares that a user is following
-            $query = "SELECT * FROM shares WHERE UserID=\"" . $UserID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM shares WHERE UserID=:UserID");
+            $stmt->bindParam(':UserID', $UserID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             $shares = [];
             foreach ($result as $row) {
                 if ($row['ShareID'] === $newShareID) {
                     $shareAreadyAdded = true;
                 }
-                $query2 = "SELECT * FROM layers WHERE ShareID=\"" . $row['ShareID'] . "\"";
-                $result2 = $db->query($query2);
+                $stmt2 = $db->prepare("SELECT * FROM layers WHERE ShareID=:ShareID");
+                $stmt2->bindParam(':ShareID', $row['ShareID']);
+                $stmt2->execute();
+                $result2 = $stmt2->fetchAll();
                 foreach ($result2 as $row2) {
                     $Description = $row2['Description'];
                     $OwnerID = $row2['UserID'];
@@ -449,8 +441,10 @@ function getShares($UserID, $newShareID) {
                 $stmt->bindParam(':UserID', $UserID);
                 $stmt->bindParam(':Accepted', $Accepted);
                 $stmt->execute();
-                $query2 = "SELECT * FROM layers WHERE ShareID=\"" . $newShareID . "\"";
-                $result2 = $db->query($query2);
+                $stmt2 = $db->prepare("SELECT * FROM layers WHERE ShareID=:ShareID");
+                $stmt2->bindParam(':ShareID', $newShareID);
+                $stmt2->execute();
+                $result2 = $stmt2->fetchAll();
                 foreach ($result2 as $row2) {
                     $Description = $row2['Description'];
                     $OwnerID = $row2['UserID'];
@@ -481,8 +475,11 @@ function removeShare($UserID, $ShareID) {
             if ($db == null) {
                 return false;
             }
-            $query = "DELETE FROM shares WHERE ShareID=\"" . $ShareID . "\" AND UserID=\"" . $UserID . "\"";
-            $db->query($query);
+            $stmt = $db->prepare("DELETE FROM shares WHERE ShareID=:ShareID AND UserID=:UserID");
+            $stmt->bindParam(':ShareID', $ShareID);
+            $stmt->bindParam(':UserID', $UserID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             closeDB($db);
             return true;
         } catch (PDOException $e) {
@@ -522,8 +519,10 @@ function getDisplayName($UserID) {
             return null;
         }
         $displayname = null;
-        $query = "SELECT * FROM users WHERE UserID=\"" . $UserID . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM users WHERE UserID=:UserID");
+        $stmt->bindParam(':UserID', $UserID);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         foreach ($result as $row) {
             $displayname = $row['displayname'];
         }
@@ -542,8 +541,10 @@ function layerExists($LayerID) {
         if ($db == null) {
             return false;
         }
-        $query = "SELECT * FROM layers WHERE LayerID=\"" . $LayerID . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM layers WHERE LayerID=:LayerID");
+        $stmt->bindParam(':LayerID', $LayerID);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $numRows = 0;
         foreach ($result as $row) {
             $numRows++;
@@ -569,8 +570,10 @@ function getLayerType($LayerID) {
             if ($db == null) {
                 return null;
             }
-            $query = "SELECT * FROM layers WHERE LayerID=\"" . $LayerID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM layers WHERE LayerID=:LayerID");
+            $stmt->bindParam(':LayerID', $LayerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             $layerType = null;
             foreach ($result as $row) {
                 $layerType = $row['Type'];
@@ -596,15 +599,19 @@ function getUserLocationMarker($LayerID) {
             }
             $layerType = getLayerType($LayerID);
             $markers = array();
-            $query = "SELECT * FROM layers WHERE LayerID=\"" . $LayerID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM layers WHERE LayerID=:LayerID");
+            $stmt->bindParam(':LayerID', $LayerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             foreach ($result as $row) {
                 $ShareID = $row['ShareID'];
                 $Description = $row['Description'];
             }
             $MarkerID = uniqid();  // this will change each update, but it's only useful for the JavaScript menu
-            $query = "SELECT * FROM geoloc WHERE ShareID=\"" . $ShareID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM geoloc WHERE ShareID=:ShareID");
+            $stmt->bindParam(':ShareID', $ShareID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             foreach ($result as $row) {
                 $marker = array('MarkerID' => $MarkerID, 'LayerID' => $LayerID, 'Type' => 'Dynamic', 'Lat' => $row['Lat'], 'Lon' => $row['Lon'], 'Time' => $row['Time'], 'Description' => $Description);
                 $markers = array($marker);
@@ -631,8 +638,10 @@ function getLayerMarkers($LayerID) {
             }
             $layerType = getLayerType($LayerID);
             $markers = array();
-            $query = "SELECT * FROM markers WHERE LayerID=\"" . $LayerID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM markers WHERE LayerID=:LayerID");
+            $stmt->bindParam(':LayerID', $LayerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             foreach ($result as $row) {
                 $marker = array('MarkerID' => $row['MarkerID'], 'LayerID' => $LayerID, 'Type' => $row['Type'], 'Lat' => $row['Lat'], 'Lon' => $row['Lon'], 'Time' => $row['Time'], 'Description' => $row['Description']);
                 $markers[] = $marker;
@@ -696,8 +705,12 @@ function setShare($authtoken, $ShareID) {
             if ($db == null) {
                 return null;
             }
-            $query = "UPDATE layers SET ShareID=\"" . $ShareID . "\" WHERE UserID=\"" . $UserID . "\" AND Type=\"userLocation\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("UPDATE layers SET ShareID=:ShareID WHERE UserID=:UserID AND Type=\"userLocation\"");
+            $stmt->bindParam(':ShareID', $ShareID);
+            $stmt->bindParam(':UserID', $UserID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
+
             closeDB($db);
             return true;
         } catch (PDOException $e) {
@@ -750,8 +763,10 @@ function getSharedUserLocation($authtoken, $ShareID) {
             if ($db == null) {
                 return $locData;
             }
-            $query = "SELECT * FROM geoloc WHERE ShareID=\"" . $ShareID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM geoloc WHERE ShareID=:ShareID");
+            $stmt->bindParam(':ShareID', $ShareID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             $numRows = 0;
             foreach ($result as $row) {
                 if ($row['ShareID'] === $ShareID) {
@@ -780,9 +795,10 @@ function deleteMarker($authtoken, $MarkerID) {
             if ($db == null) {
                 return false;
             }
-            $query = "DELETE FROM markers WHERE MarkerID=\"" . $MarkerID . "\"";
-
-            $db->query($query);
+            $stmt = $db->prepare("DELETE FROM markers WHERE MarkerID=:MarkerID");
+            $stmt->bindParam(':MarkerID', $MarkerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             closeDB($db);
             return true;
         } catch (PDOException $e) {
@@ -810,15 +826,22 @@ function shareLayer($UserID, $LayerID, $shareState) {
             $ShareID = uniqid();
             $oldShareID = getShareIDFromLayerID($LayerID);
             if ($shareState === 1) {
-                $query = "UPDATE layers SET ShareID=\"" . $ShareID . "\" WHERE LayerID=\"" . $LayerID . "\"";
-                $result = $db->query($query);
+                $stmt = $db->prepare("UPDATE layers SET ShareID=:ShareID WHERE LayerID=:LayerID");
+                $stmt->bindParam(':ShareID', $ShareID);
+                $stmt->bindParam(':LayerID', $LayerID);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
             } else {
                 // Remove all records in the shares table with the old ShareID
-                $query = "DELETE FROM shares WHERE ShareID=\"" . $oldShareID . "\"";
-                $result = $db->query($query);
+                $stmt = $db->prepare("DELETE FROM shares WHERE ShareID=:oldShareID");
+                $stmt->bindParam(':oldShareID', $oldShareID);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
                 // Remove the ShareID from the layers table so we know it is not shared
-                $query = "UPDATE layers SET ShareID=null WHERE LayerID=\"" . $LayerID . "\"";
-                $result = $db->query($query);
+                $stmt = $db->prepare("UPDATE layers SET ShareID=null WHERE LayerID=:LayerID");
+                $stmt->bindParam(':LayerID', $LayerID);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
             }
             closeDB($db);
             return true;
@@ -840,10 +863,14 @@ function deleteLayer($authtoken, $LayerID) {
             if ($db == null) {
                 return false;
             }
-            $query = "DELETE FROM layers WHERE LayerID=\"" . $LayerID . "\"";
-            $db->query($query);
-            $query = "DELETE FROM markers WHERE LayerID=\"" . $LayerID . "\"";
-            $db->query($query);
+            $stmt = $db->prepare("DELETE FROM layers WHERE LayerID=:LayerID");
+            $stmt->bindParam(':LayerID', $LayerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
+            $stmt = $db->prepare("DELETE FROM markers WHERE LayerID=:LayerID");
+            $stmt->bindParam(':LayerID', $LayerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             closeDB($db);
             return true;
         } catch (PDOException $e) {
@@ -862,8 +889,10 @@ function shareExists($ShareID) {
         if ($db == null) {
             return false;
         }
-        $query = "SELECT * FROM layers WHERE ShareID=\"" . $ShareID . "\"";
-        $result = $db->query($query);
+        $stmt = $db->prepare("SELECT * FROM layers WHERE ShareID=:ShareID");
+        $stmt->bindParam(':ShareID', $ShareID);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
         $numRows = 0;
         foreach ($result as $row) {
             $numRows++;
@@ -920,11 +949,17 @@ function updateShareAcceptance($UserID, $shareData) {
             foreach ($shareData as $shareUpdate) {
                 $ShareID = $shareUpdate['ShareID'];
                 $acceptance = $shareUpdate['Accepted'];
-                $query = "UPDATE shares SET Accepted=\"" . $acceptance . "\" WHERE ShareID=\"" . $ShareID . "\" AND UserID=\"" . $UserID . "\"";
-                $result = $db->query($query);
+                $stmt = $db->prepare("UPDATE shares SET Accepted=:Accepted WHERE ShareID=:ShareID AND UserID=:UserID");                
+                $stmt->bindParam(':UserID', $UserID);
+                $stmt->bindParam(':ShareID', $ShareID);
+                $stmt->bindParam(':Accepted', $acceptance);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
             }
-            $query = "DELETE FROM shares WHERE Accepted=\"2\" AND UserID=\"" . $UserID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("DELETE FROM shares WHERE Accepted=2 AND UserID=:UserID");
+            $stmt->bindParam(':UserID', $UserID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             closeDB($db);
             return true;
         } catch (PDOException $e) {
@@ -944,8 +979,10 @@ function getShareIDFromLayerID($LayerID) {
             if ($db == null) {
                 return null;
             }
-            $query = "SELECT * FROM layers WHERE LayerID=\"" . $LayerID . "\"";
-            $result = $db->query($query);
+            $stmt = $db->prepare("SELECT * FROM layers WHERE LayerID=:LayerID");
+            $stmt->bindParam(':LayerID', $LayerID);
+            $stmt->execute();
+            $result = $stmt->fetchAll();
             foreach ($result as $row) {
                 $ShareID = $row['ShareID'];
             }
